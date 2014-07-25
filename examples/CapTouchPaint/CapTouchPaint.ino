@@ -37,12 +37,12 @@ void setup(void) {
   while (!Serial);     // used for leonardo debugging
  
   Serial.begin(115200);
-  Serial.println(F("Touch Paint!"));
+  Serial.println(F("Cap Touch Paint!"));
   
   tft.begin();
 
   if (! ctp.begin(40)) {  // pass in 'sensitivity' coefficient
-    Serial.println("Couldn't start touchscreen controller");
+    Serial.println("Couldn't start FT6206 touchscreen controller");
     while (1);
   }
 
