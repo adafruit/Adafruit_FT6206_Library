@@ -25,6 +25,10 @@
 
 #include <Adafruit_FT6206.h>
 
+#if defined(__SAM3X8E__)
+    #define Wire Wire1
+#endif
+
 /**************************************************************************/
 /*! 
     @brief  Instantiates a new FT6206 class
