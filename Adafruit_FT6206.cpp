@@ -134,10 +134,12 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
     return;
   }
 
+  /*
   if (touches == 2) Serial.print('2');
   for (uint8_t i=0; i<16; i++) {
    // Serial.print("0x"); Serial.print(i2cdat[i], HEX); Serial.print(" ");
   }
+  */
 
   /*
   Serial.println();
