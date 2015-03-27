@@ -47,7 +47,7 @@ int Background = ILI9341_BLACK;
 int ObjectX = XSIZE / 2;
 int ObjectY = YSIZE / 2;
 int ObjectSize = XSIZE / 8;
-uint8_t ObjectColor = 0;
+uint8_t ObjectColor = 1;
 
 int XOriginal[ 2 ];
 int YOriginal[ 2 ];
@@ -183,25 +183,28 @@ void touch() {
     YCurrent[ 1 ] = -1;
   }
 
-  if ( XCurrent[ 0 ] != -1 && XPrevious[ 0 ] == -1 ) {
-    touchDown( XCurrent[ 0 ], YCurrent[ 0 ] );
-    XOriginal[ 0 ] = XCurrent[ 0 ];
-    YOriginal[ 0 ] = YCurrent[ 0 ];
-  }
-  else {
-    if ( XCurrent[ 0 ] == -1 && XPrevious[ 0 ] != -1 ) {
-      touchUp( XPrevious[ 0 ], YPrevious[ 0 ] );
-    } else {
-      if ( XCurrent[ 0 ] != XPrevious[ 0 ] || YCurrent[ 0 ] != YPrevious[ 1 ] )
-        touchMove( XCurrent[ 0 ], YCurrent[ 0 ] );
-    }
-  }
-
   for ( uint8_t i = 0; i < 2; i++) {
     int xp = XPrevious[ i ];
     int yp = YPrevious[ i ];
     int xc = XCurrent[ i ];
     int yc = YCurrent[ i ];
+
+    // Create single touch events
+    if ( xc != -1 && xp == -1 ) {
+      touchDown( xc, yc );
+      XOriginal[ i ] = xc;
+      YOriginal[ i ] = yc;
+    }
+    else {
+      if ( xc == -1 && xp != -1 ) {
+        touchUp( xp, yp );
+      } else {
+        if ( xc != xp || yc != yp )
+          touchMove( xc, yc );
+      }
+    }
+
+    // Drawing the touch
     if ( xp != -1 && ( xp != xc || yp != yc ) ) {
       if ( i == 0 )
         tft.drawCircle( xp, yp, TOUCH_RADIUS, Background );
@@ -215,6 +218,7 @@ void touch() {
         tft.drawTriangle( xc, yc - TOUCH_RADIUS, xc - TOUCH_TRIANGLE_X, yc + TOUCH_TRIANGLE_Y, xc + TOUCH_TRIANGLE_X, yc + TOUCH_TRIANGLE_Y, Touch  );
     }
 
+    // What is new will be old
     XPrevious[ i ] = XCurrent[ i ];
     YPrevious[ i ] = YCurrent[ i ];
   }
