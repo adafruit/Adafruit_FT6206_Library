@@ -27,6 +27,9 @@ Adafruit_FT6206 ctp = Adafruit_FT6206();
 #define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
+#define TOUCH_TAP_TIME 200
+#define TOUCH_DOUBLE_TAP_TIME 500
+
 #define XSIZE 240
 #define YSIZE 320
 #define COLOR_COUNT 3
@@ -44,10 +47,13 @@ int Background = ILI9341_BLACK;
 #define OBJECT_SIZE_MINIMUM XSIZE / 32
 #define OBJECT_SIZE_MAXIMUM XSIZE / 2
 
+#define OBJECT_TYPE_COUNT 3
+
 int ObjectX = XSIZE / 2;
 int ObjectY = YSIZE / 2;
 int ObjectSize = XSIZE / 8;
-uint8_t ObjectColor = 1;
+uint8_t ObjectColor = 0;
+uint8_t ObjectType = 0;
 
 class CtpPoint {
 public:
@@ -72,9 +78,28 @@ public:
   CtpPoint original;
   CtpPoint current;
   CtpPoint previous;
-  int touchDownTime;
-  int touchUpTime;
+  unsigned long touchDownTime;
+  unsigned long touchUpTime;
 } CtpTouches[ 2 ];
+
+
+void drawObject( int color = Background ) {
+  switch ( ObjectType ) {
+    case 0:
+      tft.fillCircle( ObjectX, ObjectY, ObjectSize, color );
+      break;
+    case 1:
+      tft.fillRect( ObjectX - ObjectSize, ObjectY - ObjectSize, 2 * ObjectSize, 2 * ObjectSize, color );
+      break;
+    case 2:
+      tft.fillTriangle( ObjectX, ObjectY - 3 * ObjectSize / 2, ObjectX - 21 * ObjectSize / 16, ObjectY + 3 * ObjectSize / 4 , ObjectX + 21 * ObjectSize / 16, ObjectY + 3 * ObjectSize / 4, color );
+      break;
+  }
+}
+
+void eraseObject() {
+  drawObject();
+}
 
 void setup(void) {
   while (!Serial);     // used for leonardo debugging
@@ -97,9 +122,11 @@ void setup(void) {
     t->original.clear();
     t->current.clear();
     t->previous.clear();
-    t->touchDownTime = -1;
-    t->touchUpTime = -1;
+    t->touchDownTime = 0;
+    t->touchUpTime = 0;
   }
+
+  drawObject( Colors[ ObjectColor ] );
 }
 
 bool Dragging = false;
@@ -137,7 +164,7 @@ void touchUp( int x, int y ) {
     int newX = x - DraggingOffsetX;
     int newY = y - DraggingOffsetY;
     if ( ObjectX != newX || ObjectY != newY )   {
-      tft.fillCircle( ObjectX, ObjectY, ObjectSize, Background );
+      eraseObject();
 
       Serial.print( "    x " ); Serial.print( x ); Serial.print( " OY " ); Serial.println( y );
       Serial.print( "    Ox " ); Serial.print( ObjectX ); Serial.print( " OY " ); Serial.println( ObjectY );
@@ -152,19 +179,30 @@ void touchUp( int x, int y ) {
       if ( ObjectX >= XSIZE ) ObjectX = XSIZE - 1;
       if ( ObjectY >= YSIZE ) ObjectY = YSIZE - 1;
 
-      tft.fillCircle( ObjectX, ObjectY, ObjectSize, Background );
+      drawObject( Colors[ ObjectColor ] );
     }
 
   }
+}
+
+void touchTap( int x, int y ) {
+  Serial.println( "Tap" );
+}
+
+void touchDoubleTap( int x, int y ) {
+  Serial.println( "DoubleTap" );
+  eraseObject();
+  ObjectType = ( ObjectType + 1 ) % OBJECT_TYPE_COUNT;
+  drawObject( Colors[ ObjectColor ] );
 }
 
 void loop() {
 
   touch();
 
-  tft.fillCircle( ObjectX, ObjectY, ObjectSize, Colors[ ObjectColor ] );
-
+  drawObject( Colors[ ObjectColor ] );
 }
+
 
 void touch() {
 
@@ -207,10 +245,19 @@ void touch() {
     if ( !t->current.isClear() && t->previous.isClear() ) {
       touchDown( t->current.x, t->current.y );
       t->original = t->current;
+      t->touchDownTime = millis();
     }
     else {
       if ( t->current.isClear() && !t->previous.isClear() ) {
         touchUp( t->previous.x, t->previous.y );
+        unsigned long up = millis();
+        if ( ( up - t->touchDownTime ) < TOUCH_TAP_TIME ) {
+          touchTap( t->current.x, t->current.y );
+          if ( ( up - t->touchUpTime ) < TOUCH_DOUBLE_TAP_TIME ) {
+            touchDoubleTap( t->current.x, t->current.y );
+          }
+          t->touchUpTime = up;
+        }
       } else {
         if ( !t->current.isClear() && !t->previous.isClear() ) {
           touchMove( t->current.x, t->current.y );
