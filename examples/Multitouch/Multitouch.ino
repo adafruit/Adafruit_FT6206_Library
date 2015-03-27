@@ -49,12 +49,32 @@ int ObjectY = YSIZE / 2;
 int ObjectSize = XSIZE / 8;
 uint8_t ObjectColor = 1;
 
-int XOriginal[ 2 ];
-int YOriginal[ 2 ];
-int XCurrent[ 2 ];
-int YCurrent[ 2 ];
-int XPrevious[ 2 ];
-int YPrevious[ 2 ];
+class CtpPoint {
+public:
+  int x;
+  int y;
+  CtpPoint() { clear(); }
+  CtpPoint( int x_, int y_ ): x( x_ ), y( y_ ) {}
+  void set( int x_, int y_ ) { x = x_; y = y_; }
+  void clear() { x = -1; y = -1; }
+  bool isClear() { return ( ( x == -1 ) && ( y == -1 ) ); }
+  bool operator==(CtpPoint p) {
+    return  ( ( p.x == x ) && ( p.y == y ) );
+  }
+  bool operator!=(CtpPoint p) {
+    return  ( ( p.x != x ) || ( p.y != y ) );
+  }
+};
+
+class CtpTouch {
+public:
+  CtpTouch() {}
+  CtpPoint original;
+  CtpPoint current;
+  CtpPoint previous;
+  int touchDownTime;
+  int touchUpTime;
+} CtpTouches[ 2 ];
 
 void setup(void) {
   while (!Serial);     // used for leonardo debugging
@@ -73,10 +93,12 @@ void setup(void) {
   tft.fillScreen( Background );
 
   for ( uint8_t i = 0; i < 2; i++) {
-    XCurrent[ i ] = -1;
-    YCurrent[ i ] = -1;
-    XPrevious[ i ] = -1;
-    YPrevious[ i ] = -1;
+    CtpTouch* t = &CtpTouches[ i ];
+    t->original.clear();
+    t->current.clear();
+    t->previous.clear();
+    t->touchDownTime = -1;
+    t->touchUpTime = -1;
   }
 }
 
@@ -151,6 +173,7 @@ void touch() {
 
   n = ctp.readMultiData( &id[ 0 ], &x[ 0 ], &y[ 0 ], &id[ 1 ], &x[ 1 ], &y[ 1 ] );
 
+  // Extract and update the touch information
   if ( n > 0 ){
     for ( uint8_t i = 0; i < n; i++) {
       int idi = id[ i ];
@@ -158,69 +181,65 @@ void touch() {
       int yi = map(y[ i ], 0, 320, 320, 0);
       //Serial.print( "T" ); Serial.print( i ); Serial.print( " " ); Serial.print( idi ); Serial.print( " " ); Serial.print( xi ); Serial.print( "," ); Serial.println( yi );
       if ( idi == 0 ) {
-         XCurrent[ 0 ] = xi;
-         YCurrent[ 0 ] = yi;
+         CtpTouches[ 0 ].current.set( xi, yi );
          if ( n == 1 ) {
-           XCurrent[ 1 ] = -1;
-           YCurrent[ 1 ] = -1;
+           CtpTouches[ 1 ].current.clear( );
          }
       }
       else {
-         XCurrent[ 1 ] = xi;
-         YCurrent[ 1 ] = yi;
+         CtpTouches[ 1 ].current.set( xi, yi );
          if ( n == 1 ) {
-           XCurrent[ 0 ] = -1;
-           YCurrent[ 0 ] = -1;
+           CtpTouches[ 0 ].current.clear();
          }
       }
     }
   }
 
   if ( n == 0 ) {
-    XCurrent[ 0 ] = -1;
-    YCurrent[ 0 ] = -1;
-    XCurrent[ 1 ] = -1;
-    YCurrent[ 1 ] = -1;
+    CtpTouches[ 0 ].current.clear();
+    CtpTouches[ 1 ].current.clear();
   }
 
   for ( uint8_t i = 0; i < 2; i++) {
-    int xp = XPrevious[ i ];
-    int yp = YPrevious[ i ];
-    int xc = XCurrent[ i ];
-    int yc = YCurrent[ i ];
+    CtpTouch* t = &CtpTouches[ i ];
 
     // Create single touch events
-    if ( xc != -1 && xp == -1 ) {
-      touchDown( xc, yc );
-      XOriginal[ i ] = xc;
-      YOriginal[ i ] = yc;
+    if ( !t->current.isClear() && t->previous.isClear() ) {
+      touchDown( t->current.x, t->current.y );
+      t->original = t->current;
     }
     else {
-      if ( xc == -1 && xp != -1 ) {
-        touchUp( xp, yp );
+      if ( t->current.isClear() && !t->previous.isClear() ) {
+        touchUp( t->previous.x, t->previous.y );
       } else {
-        if ( xc != xp || yc != yp )
-          touchMove( xc, yc );
+        if ( !t->current.isClear() && !t->previous.isClear() ) {
+          touchMove( t->current.x, t->current.y );
+        }
       }
     }
 
     // Drawing the touch
-    if ( xp != -1 && ( xp != xc || yp != yc ) ) {
+    if ( !t->previous.isClear() && t->previous != t->current ) {
+      int x = t->previous.x;
+      int y = t->previous.y;
       if ( i == 0 )
-        tft.drawCircle( xp, yp, TOUCH_RADIUS, Background );
-      else
-        tft.drawTriangle( xp, yp - TOUCH_RADIUS, xp - TOUCH_TRIANGLE_X, yp + TOUCH_TRIANGLE_Y, xp + TOUCH_TRIANGLE_X, yp + TOUCH_TRIANGLE_Y, Background  );
+        tft.drawCircle( x, y, TOUCH_RADIUS, Background );
+      else {
+        tft.drawTriangle( x, y - TOUCH_TRIANGLE_TOP, x - TOUCH_TRIANGLE_X, y + TOUCH_TRIANGLE_Y, x + TOUCH_TRIANGLE_X, y + TOUCH_TRIANGLE_Y, Background  );
+      }
     }
-    if ( xc != -1 && ( xp != xc || yp != yc ) ) {
+    if ( !t->current.isClear() && t->previous != t->current ) {
+      int x = t->current.x;
+      int y = t->current.y;
       if ( i == 0 )
-        tft.drawCircle( xc, yc, TOUCH_RADIUS, Touch );
-      else
-        tft.drawTriangle( xc, yc - TOUCH_RADIUS, xc - TOUCH_TRIANGLE_X, yc + TOUCH_TRIANGLE_Y, xc + TOUCH_TRIANGLE_X, yc + TOUCH_TRIANGLE_Y, Touch  );
+        tft.drawCircle( x, y, TOUCH_RADIUS, Touch );
+      else {
+        tft.drawTriangle( x, y - TOUCH_TRIANGLE_TOP, x - TOUCH_TRIANGLE_X, y + TOUCH_TRIANGLE_Y, x + TOUCH_TRIANGLE_X, y + TOUCH_TRIANGLE_Y, Touch  );
+      }
     }
 
     // What is new will be old
-    XPrevious[ i ] = XCurrent[ i ];
-    YPrevious[ i ] = YCurrent[ i ];
+    t->previous = t->current;
   }
 
 }
