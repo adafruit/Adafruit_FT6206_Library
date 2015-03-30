@@ -418,7 +418,7 @@ void touch() {
           unsigned long up = millis();
           if ( ( up - t->touchDownTime ) < TOUCH_TAP_TIME ) {
             // OK.  So that was a tap.
-            touchTap( t->current.x, t->current.y, i );
+            touchTap( t->previous.x, t->previous.y, i );
             // Was that a double tap?
             // The second tap needs to occur soon after the firt
             if ( ( up - t->touchUpTime ) < TOUCH_DOUBLE_TAP_TIME ) {
@@ -428,7 +428,7 @@ void touch() {
               // Serial.println( dCSq );
               if ( dCSq < TOUCH_DOUBLE_TAP_MAXIMUM_DISTANCE_SQ ) {
                 // OK signal teh double tap
-                touchDoubleTap( t->current.x, t->current.y, i );
+                touchDoubleTap( t->previous.x, t->previous.y, i );
               }
               // Prevent an ongoing sequence of double taps on each subsequent tap
               up = 0;

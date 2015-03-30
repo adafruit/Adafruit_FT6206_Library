@@ -183,6 +183,14 @@ uint8_t Adafruit_FT6206::readMultiData(uint8_t *id0, uint16_t *x0, uint16_t *y0,
 
   // call the main data reader... it does the job
   readData( x0, y0 );
+  // readData returns 0 - 0 if there was no touch when it got around to reading it
+  // -1's might have been another good choice
+  if ( x0 == 0 && y0 == 0 ) {
+    *id0 = 0x0F;
+    *id1 = 0x0F;
+    return 0;
+  }
+
   *id0 = touchID[ 0 ];
   *id1 = touchID[ 1 ];
   *x1 = touchX[ 1 ];
