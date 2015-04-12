@@ -1,8 +1,8 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Adafruit Capacitive Touch Screens
 
   ----> http://www.adafruit.com/products/1947
- 
+
   Check out the links above for our tutorials and wiring diagrams
   This chipset uses I2C to communicate
 
@@ -48,7 +48,7 @@ class TS_Point {
  public:
   TS_Point(void);
   TS_Point(int16_t x, int16_t y, int16_t z);
-  
+
   bool operator==(TS_Point);
   bool operator!=(TS_Point);
 
@@ -59,13 +59,14 @@ class Adafruit_FT6206 {
  public:
 
   Adafruit_FT6206(void);
-  boolean begin(uint8_t thresh = FT6206_DEFAULT_THRESSHOLD);  
+  boolean begin(uint8_t thresh = FT6206_DEFAULT_THRESSHOLD);
 
   void writeRegister8(uint8_t reg, uint8_t val);
   uint8_t readRegister8(uint8_t reg);
 
   void readData(uint16_t *x, uint16_t *y);
-  void autoCalibrate(void); 
+  uint8_t readMultiData(uint8_t *id0, uint16_t *x0, uint16_t *y0, uint8_t *id1, uint16_t *x1, uint16_t *y1 );
+  void autoCalibrate(void);
 
   boolean touched(void);
   TS_Point getPoint(void);
@@ -75,4 +76,3 @@ class Adafruit_FT6206 {
   uint16_t touchX[2], touchY[2], touchID[2];
 
 };
-
