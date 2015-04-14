@@ -13,16 +13,16 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.
   MIT license, all text above must be included in any redistribution
  ****************************************************/
+#include <Wire.h>
 
+#ifndef _ADAFRUIT_FT6206_h
+#define _ADAFRUIT_FT6206_h
 
 #if ARDUINO >= 100
  #include "Arduino.h"
 #else
  #include "WProgram.h"
 #endif
-
-#include <Wire.h>
-
 
 #define FT6206_ADDR           0x38
 #define FT6206_G_FT5201ID     0xA8
@@ -76,3 +76,4 @@ class Adafruit_FT6206 {
 
 };
 
+#endif
