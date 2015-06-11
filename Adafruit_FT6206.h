@@ -14,6 +14,8 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
+#ifndef ADAFRUIT_FT6206_LIBRARY
+#define ADAFRUIT_FT6206_LIBRARY
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -76,3 +78,4 @@ class Adafruit_FT6206 {
 
 };
 
+#endif //ADAFRUIT_FT6206_LIBRARY
