@@ -173,7 +173,6 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
 
 TS_Point Adafruit_FT6206::getPoint(void) {
   uint16_t x, y;
-  uint8_t z;
   readData(&x, &y);
   return TS_Point(x, y, 1);
 }
