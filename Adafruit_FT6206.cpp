@@ -1,8 +1,8 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Adafruit Capacitive Touch Screens
 
   ----> http://www.adafruit.com/products/1947
- 
+
   Check out the links above for our tutorials and wiring diagrams
   This chipset uses I2C to communicate
 
@@ -30,7 +30,7 @@
 #endif
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Instantiates a new FT6206 class
 */
 /**************************************************************************/
@@ -40,18 +40,28 @@ Adafruit_FT6206::Adafruit_FT6206() {
 
 
 /**************************************************************************/
-/*! 
+/*!
     @brief  Setups the HW
 */
 /**************************************************************************/
 boolean Adafruit_FT6206::begin(uint8_t threshhold) {
   Wire.begin();
 
+  // This is not a  FocalTech chip
+  if ((readRegister8(FT6206_REG_VENDID) != FT6206_VENDID)) {
+    return false;
+  }
+
+  // This is not a FT6026 or FT6236 chip
+  chipid = readRegister8(FT6206_REG_CHIPID);
+  if ((chipid != FT6026_CHIPID) && (chipid != FT6236_CHIPID)) {
+    return false;
+  }
+
   // change threshhold to be higher/lower
   writeRegister8(FT6206_REG_THRESHHOLD, threshhold);
-  
-  if ((readRegister8(FT6206_REG_VENDID) != 17) || (readRegister8(FT6206_REG_CHIPID) != 6)) return false;
-  /* 
+
+  /*
   Serial.print("Vend ID: "); Serial.println(readRegister8(FT6206_REG_VENDID));
   Serial.print("Chip ID: "); Serial.println(readRegister8(FT6206_REG_CHIPID));
   Serial.print("Firm V: "); Serial.println(readRegister8(FT6206_REG_FIRMVERS));
@@ -79,7 +89,7 @@ void Adafruit_FT6206::autoCalibrate(void) {
    uint8_t temp;
    temp = readRegister8(FT6206_REG_MODE);
    Serial.println(temp, HEX);
-   //return to normal mode, calibration finish 
+   //return to normal mode, calibration finish
    if (0x0 == ((temp & 0x70) >> 4))
      break;
  }
@@ -96,7 +106,7 @@ void Adafruit_FT6206::autoCalibrate(void) {
 
 
 boolean Adafruit_FT6206::touched(void) {
-  
+
   uint8_t n = readRegister8(FT6206_REG_NUMTOUCHES);
   if ((n == 1) || (n == 2)) return true;
   return false;
@@ -108,13 +118,13 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
 
   uint8_t i2cdat[16];
   Wire.beginTransmission(FT6206_ADDR);
-  Wire.write((byte)0);  
+  Wire.write((byte)0);
   Wire.endTransmission();
   Wire.beginTransmission(FT6206_ADDR);
   Wire.requestFrom((byte)FT6206_ADDR, (byte)32);
   for (uint8_t i=0; i<16; i++)
     i2cdat[i] = Wire.read();
-  Wire.endTransmission();  
+  Wire.endTransmission();
 
   /*
   for (int16_t i=0; i<0x20; i++) {
@@ -144,7 +154,7 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
   /*
   Serial.println();
   if (i2cdat[0x01] != 0x00) {
-    Serial.print("Gesture #"); 
+    Serial.print("Gesture #");
     Serial.println(i2cdat[0x01]);
   }
   */
@@ -153,7 +163,7 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
     for (uint8_t i=0; i<2; i++) {
       touchX[i] = i2cdat[0x03 + i*6] & 0x0F;
       touchX[i] <<= 8;
-      touchX[i] |= i2cdat[0x04 + i*6]; 
+      touchX[i] |= i2cdat[0x04 + i*6];
       touchY[i] = i2cdat[0x05 + i*6] & 0x0F;
       touchY[i] <<= 8;
       touchY[i] |= i2cdat[0x06 + i*6];
@@ -173,7 +183,6 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
 
 TS_Point Adafruit_FT6206::getPoint(void) {
   uint16_t x, y;
-  uint8_t z;
   readData(&x, &y);
   return TS_Point(x, y, 1);
 }
@@ -190,9 +199,9 @@ uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
     x = Wire.read();
     Wire.endTransmission();
 
-  //  Serial.print("$"); Serial.print(reg, HEX); 
+  //  Serial.print("$"); Serial.print(reg, HEX);
   //  Serial.print(": 0x"); Serial.println(x, HEX);
-  
+
   return x;
 }
 

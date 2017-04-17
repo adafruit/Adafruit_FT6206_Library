@@ -2,6 +2,8 @@
   This is a library for the Adafruit FT6206-Based capacitive
   touch screens and displays
   ----> http://www.adafruit.com/products/1947
+
+  2017-04-17 - Added support for FT6236-based capacitive touch screens
  
   Check out the links above for our tutorials and wiring diagrams
   This chip uses I2C to communicate
