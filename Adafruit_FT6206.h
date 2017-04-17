@@ -1,8 +1,8 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Adafruit Capacitive Touch Screens
 
   ----> http://www.adafruit.com/products/1947
- 
+
   Check out the links above for our tutorials and wiring diagrams
   This chipset uses I2C to communicate
 
@@ -40,8 +40,14 @@
 #define FT6206_REG_THRESHHOLD 0x80
 #define FT6206_REG_POINTRATE 0x88
 #define FT6206_REG_FIRMVERS 0xA6
+
 #define FT6206_REG_CHIPID 0xA3
+#define FT6026_CHIPID 6
+#define FT6236_CHIPID 54
+
 #define FT6206_REG_VENDID 0xA8
+#define FT6206_VENDID 17
+
 
 // calibrated for Adafruit 2.8" ctp screen
 #define FT6206_DEFAULT_THRESSHOLD 128
@@ -50,7 +56,7 @@ class TS_Point {
  public:
   TS_Point(void);
   TS_Point(int16_t x, int16_t y, int16_t z);
-  
+
   bool operator==(TS_Point);
   bool operator!=(TS_Point);
 
@@ -61,20 +67,23 @@ class Adafruit_FT6206 {
  public:
 
   Adafruit_FT6206(void);
-  boolean begin(uint8_t thresh = FT6206_DEFAULT_THRESSHOLD);  
+  boolean begin(uint8_t thresh = FT6206_DEFAULT_THRESSHOLD);
 
   void writeRegister8(uint8_t reg, uint8_t val);
   uint8_t readRegister8(uint8_t reg);
 
   void readData(uint16_t *x, uint16_t *y);
-  void autoCalibrate(void); 
+  void autoCalibrate(void);
 
   boolean touched(void);
   TS_Point getPoint(void);
 
+  uint8_t getChipID() { return chipid; }
+
  private:
   uint8_t touches;
   uint16_t touchX[2], touchY[2], touchID[2];
+  uint8_t chipid;
 
 };
 
