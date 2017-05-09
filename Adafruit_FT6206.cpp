@@ -110,14 +110,12 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
   Wire.beginTransmission(FT6206_ADDR);
   Wire.write((byte)0);  
   Wire.endTransmission();
-  Wire.beginTransmission(FT6206_ADDR);
-  Wire.requestFrom((byte)FT6206_ADDR, (byte)32);
+  Wire.requestFrom((byte)FT6206_ADDR, (byte)16);
   for (uint8_t i=0; i<16; i++)
     i2cdat[i] = Wire.read();
-  Wire.endTransmission();  
 
   /*
-  for (int16_t i=0; i<0x20; i++) {
+  for (int16_t i=0; i<0x10; i++) {
     Serial.print("I2C $"); Serial.print(i, HEX); Serial.print(" = 0x"); Serial.println(i2cdat[i], HEX);
   }
   */
@@ -173,7 +171,6 @@ void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
 
 TS_Point Adafruit_FT6206::getPoint(void) {
   uint16_t x, y;
-  uint8_t z;
   readData(&x, &y);
   return TS_Point(x, y, 1);
 }
@@ -185,10 +182,8 @@ uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
     Wire.beginTransmission(FT6206_ADDR);
     Wire.write((byte)reg);
     Wire.endTransmission();
-    Wire.beginTransmission(FT6206_ADDR);
     Wire.requestFrom((byte)FT6206_ADDR, (byte)1);
     x = Wire.read();
-    Wire.endTransmission();
 
   //  Serial.print("$"); Serial.print(reg, HEX); 
   //  Serial.print(": 0x"); Serial.println(x, HEX);
