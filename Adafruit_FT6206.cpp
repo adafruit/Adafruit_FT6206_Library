@@ -15,19 +15,17 @@
  ****************************************************/
 
 
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-
+#include "Arduino.h"
 #include <Wire.h>
-
 #include <Adafruit_FT6206.h>
 
 #if defined(__SAM3X8E__)
     #define Wire Wire1
 #endif
+
+//#define FT6206_DEBUG
+//#define I2C_DEBUG
+
 
 /**************************************************************************/
 /*! 
@@ -36,37 +34,169 @@
 /**************************************************************************/
 // I2C, no address adjustments or pins
 Adafruit_FT6206::Adafruit_FT6206() {
+  touches = 0;
 }
 
 
 /**************************************************************************/
 /*! 
-    @brief  Setups the HW
+    @brief  Setups the I2C interface and hardware, identifies if chip is found
+    @param  thresh Optional threshhold-for-touch value, default is FT6206_DEFAULT_THRESSHOLD but you can try changing it if your screen is too/not sensitive.
+    @returns True if an FT6206 is found, false on any failure
 */
 /**************************************************************************/
-boolean Adafruit_FT6206::begin(uint8_t threshhold) {
+boolean Adafruit_FT6206::begin(uint8_t thresh) {
   Wire.begin();
 
-  // change threshhold to be higher/lower
-  writeRegister8(FT6206_REG_THRESHHOLD, threshhold);
-  
-  if ((readRegister8(FT6206_REG_VENDID) != 17) || (readRegister8(FT6206_REG_CHIPID) != 6)) return false;
-  /* 
+#ifdef FT6206_DEBUG
   Serial.print("Vend ID: "); Serial.println(readRegister8(FT6206_REG_VENDID));
   Serial.print("Chip ID: "); Serial.println(readRegister8(FT6206_REG_CHIPID));
   Serial.print("Firm V: "); Serial.println(readRegister8(FT6206_REG_FIRMVERS));
-  Serial.print("Point Rate Hz: "); Serial.println(readRegister8(FT6206_REG_POINTRATE));
-  Serial.print("Thresh: "); Serial.println(readRegister8(FT6206_REG_THRESHHOLD));
-  */
+  Serial.print("Point Rate Hz: "); 
+  Serial.println(readRegister8(FT6206_REG_POINTRATE));
+  Serial.print("Thresh: "); 
+  Serial.println(readRegister8(FT6206_REG_THRESHHOLD));
+
   // dump all registers
-  /*
   for (int16_t i=0; i<0x20; i++) {
     Serial.print("I2C $"); Serial.print(i, HEX);
     Serial.print(" = 0x"); Serial.println(readRegister8(i), HEX);
   }
-  */
+#endif
+
+  // change threshhold to be higher/lower
+  writeRegister8(FT6206_REG_THRESHHOLD, thresh);
+  
+  if ((readRegister8(FT6206_REG_VENDID) != 17) || 
+      (readRegister8(FT6206_REG_CHIPID) != 6)) {
+    return false;
+  }
+
   return true;
 }
+
+/**************************************************************************/
+/*! 
+    @brief  Determines if there are any touches detected
+    @returns Number of touches detected, can be 0, 1 or 2
+*/
+/**************************************************************************/
+uint8_t Adafruit_FT6206::touched(void) {
+  uint8_t n = readRegister8(FT6206_REG_NUMTOUCHES);
+  if (n > 2) {
+    n = 0;
+  }
+  return n;
+}
+
+/**************************************************************************/
+/*! 
+    @brief  Queries the chip and retrieves a point data
+    @param  n The # index (0 or 1) to the points we can detect. In theory we can detect 2 points but we've found that you should only use this for single-touch since the two points cant share the same half of the screen.
+    @returns {@link TS_Point} object that has the x and y coordinets set. If the z coordinate is 0 it means the point is not touched. If z is 1, it is currently touched.
+*/
+/**************************************************************************/
+TS_Point Adafruit_FT6206::getPoint(uint8_t n) {
+  readData();
+  if ((touches == 0) || (n > 1)) {
+    return TS_Point(0, 0, 0);
+  } else {
+    return TS_Point(touchX[n], touchY[n], 1);
+  }
+}
+
+/************ lower level i/o **************/
+
+/**************************************************************************/
+/*! 
+    @brief  Reads the bulk of data from captouch chip. Fill in {@link touches}, {@link touchX}, {@link touchY} and {@link touchID} with results
+*/
+/**************************************************************************/
+void Adafruit_FT6206::readData(void) {
+
+  uint8_t i2cdat[16];
+  Wire.beginTransmission(FT6206_ADDR);
+  Wire.write((byte)0);  
+  Wire.endTransmission();
+
+  Wire.requestFrom((byte)FT6206_ADDR, (byte)16);
+  for (uint8_t i=0; i<16; i++)
+    i2cdat[i] = Wire.read();
+
+#ifdef FT6206_DEBUG
+  for (int16_t i=0; i<16; i++) {
+    Serial.print("I2C $"); Serial.print(i, HEX); 
+    Serial.print(" = 0x"); Serial.println(i2cdat[i], HEX);
+  }
+#endif
+
+  touches = i2cdat[0x02];
+  if ((touches > 2) || (touches == 0)) {
+    touches = 0;
+  }
+
+#ifdef FT6206_DEBUG
+  Serial.print("# Touches: "); Serial.println(touches);
+
+  for (uint8_t i=0; i<16; i++) {
+    Serial.print("0x"); Serial.print(i2cdat[i], HEX); Serial.print(" ");
+  }
+  Serial.println();
+  if (i2cdat[0x01] != 0x00) {
+    Serial.print("Gesture #"); 
+    Serial.println(i2cdat[0x01]);
+  }
+#endif
+
+  for (uint8_t i=0; i<2; i++) {
+    touchX[i] = i2cdat[0x03 + i*6] & 0x0F;
+    touchX[i] <<= 8;
+    touchX[i] |= i2cdat[0x04 + i*6]; 
+    touchY[i] = i2cdat[0x05 + i*6] & 0x0F;
+    touchY[i] <<= 8;
+    touchY[i] |= i2cdat[0x06 + i*6];
+    touchID[i] = i2cdat[0x05 + i*6] >> 4;
+  }
+
+#ifdef FT6206_DEBUG
+  Serial.println();
+  for (uint8_t i=0; i<touches; i++) {
+    Serial.print("ID #"); Serial.print(touchID[i]); 
+    Serial.print("\t("); Serial.print(touchX[i]);
+    Serial.print(", "); Serial.print(touchY[i]);
+    Serial.print (") ");
+  }
+  Serial.println();
+#endif
+}
+
+uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
+  uint8_t x ;
+  // use i2c
+  Wire.beginTransmission(FT6206_ADDR);
+  Wire.write((byte)reg);
+  Wire.endTransmission();
+  
+  Wire.requestFrom((byte)FT6206_ADDR, (byte)1);
+  x = Wire.read();
+
+#ifdef I2C_DEBUG
+  Serial.print("$"); Serial.print(reg, HEX); 
+  Serial.print(": 0x"); Serial.println(x, HEX);
+#endif
+
+  return x;
+}
+
+void Adafruit_FT6206::writeRegister8(uint8_t reg, uint8_t val) {
+  // use i2c
+  Wire.beginTransmission(FT6206_ADDR);
+  Wire.write((byte)reg);
+  Wire.write((byte)val);
+  Wire.endTransmission();
+}
+
+/*
 
 // DONT DO THIS - REALLY - IT DOESNT WORK
 void Adafruit_FT6206::autoCalibrate(void) {
@@ -93,116 +223,7 @@ void Adafruit_FT6206::autoCalibrate(void) {
  writeRegister8(FT6206_REG_MODE, FT6206_REG_WORKMODE);
  delay(300);
 }
-
-
-boolean Adafruit_FT6206::touched(void) {
-  
-  uint8_t n = readRegister8(FT6206_REG_NUMTOUCHES);
-  if ((n == 1) || (n == 2)) return true;
-  return false;
-}
-
-/*****************************/
-
-void Adafruit_FT6206::readData(uint16_t *x, uint16_t *y) {
-
-  uint8_t i2cdat[16];
-  Wire.beginTransmission(FT6206_ADDR);
-  Wire.write((byte)0);  
-  Wire.endTransmission();
-  Wire.beginTransmission(FT6206_ADDR);
-  Wire.requestFrom((byte)FT6206_ADDR, (byte)32);
-  for (uint8_t i=0; i<16; i++)
-    i2cdat[i] = Wire.read();
-  Wire.endTransmission();  
-
-  /*
-  for (int16_t i=0; i<0x20; i++) {
-    Serial.print("I2C $"); Serial.print(i, HEX); Serial.print(" = 0x"); Serial.println(i2cdat[i], HEX);
-  }
-  */
-
-  touches = i2cdat[0x02];
-
-  //Serial.println(touches);
-  if (touches > 2) {
-    touches = 0;
-    *x = *y = 0;
-  }
-  if (touches == 0) {
-    *x = *y = 0;
-    return;
-  }
-
-  /*
-  if (touches == 2) Serial.print('2');
-  for (uint8_t i=0; i<16; i++) {
-   // Serial.print("0x"); Serial.print(i2cdat[i], HEX); Serial.print(" ");
-  }
-  */
-
-  /*
-  Serial.println();
-  if (i2cdat[0x01] != 0x00) {
-    Serial.print("Gesture #"); 
-    Serial.println(i2cdat[0x01]);
-  }
-  */
-
-    //Serial.print("# Touches: "); Serial.print(touches);
-    for (uint8_t i=0; i<2; i++) {
-      touchX[i] = i2cdat[0x03 + i*6] & 0x0F;
-      touchX[i] <<= 8;
-      touchX[i] |= i2cdat[0x04 + i*6]; 
-      touchY[i] = i2cdat[0x05 + i*6] & 0x0F;
-      touchY[i] <<= 8;
-      touchY[i] |= i2cdat[0x06 + i*6];
-      touchID[i] = i2cdat[0x05 + i*6] >> 4;
-    }
-    /*
-    Serial.println();
-    for (uint8_t i=0; i<touches; i++) {
-      Serial.print("ID #"); Serial.print(touchID[i]); Serial.print("\t("); Serial.print(touchX[i]);
-      Serial.print(", "); Serial.print(touchY[i]);
-      Serial.print (") ");
-    }
-    Serial.println();
-    */
-    *x = touchX[0]; *y = touchY[0];
-}
-
-TS_Point Adafruit_FT6206::getPoint(void) {
-  uint16_t x, y;
-  uint8_t z;
-  readData(&x, &y);
-  return TS_Point(x, y, 1);
-}
-
-
-uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
-  uint8_t x ;
-   // use i2c
-    Wire.beginTransmission(FT6206_ADDR);
-    Wire.write((byte)reg);
-    Wire.endTransmission();
-    Wire.beginTransmission(FT6206_ADDR);
-    Wire.requestFrom((byte)FT6206_ADDR, (byte)1);
-    x = Wire.read();
-    Wire.endTransmission();
-
-  //  Serial.print("$"); Serial.print(reg, HEX); 
-  //  Serial.print(": 0x"); Serial.println(x, HEX);
-  
-  return x;
-}
-
-void Adafruit_FT6206::writeRegister8(uint8_t reg, uint8_t val) {
-   // use i2c
-    Wire.beginTransmission(FT6206_ADDR);
-    Wire.write((byte)reg);
-    Wire.write((byte)val);
-    Wire.endTransmission();
-}
+*/
 
 /****************/
 
@@ -223,3 +244,6 @@ bool TS_Point::operator==(TS_Point p1) {
 bool TS_Point::operator!=(TS_Point p1) {
   return  ((p1.x != x) || (p1.y != y) || (p1.z != z));
 }
+
+
+

@@ -17,14 +17,8 @@
 #ifndef ADAFRUIT_FT6206_LIBRARY
 #define ADAFRUIT_FT6206_LIBRARY
 
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-
+#include "Arduino.h"
 #include <Wire.h>
-
 
 #define FT6206_ADDR           0x38
 #define FT6206_G_FT5201ID     0xA8
@@ -62,17 +56,16 @@ class Adafruit_FT6206 {
 
   Adafruit_FT6206(void);
   boolean begin(uint8_t thresh = FT6206_DEFAULT_THRESSHOLD);  
+  uint8_t touched(void);
+  TS_Point getPoint(uint8_t n = 0);
 
+  //void autoCalibrate(void); 
+
+ private:
   void writeRegister8(uint8_t reg, uint8_t val);
   uint8_t readRegister8(uint8_t reg);
 
-  void readData(uint16_t *x, uint16_t *y);
-  void autoCalibrate(void); 
-
-  boolean touched(void);
-  TS_Point getPoint(void);
-
- private:
+  void readData(void);
   uint8_t touches;
   uint16_t touchX[2], touchY[2], touchID[2];
 

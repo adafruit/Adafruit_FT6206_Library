@@ -12,12 +12,6 @@
 // The FT6206 uses hardware I2C (SCL/SDA)
 Adafruit_FT6206 ts = Adafruit_FT6206();
 
-// This is calibration data for the raw touch data to the screen coordinates
-#define TS_MINX 150
-#define TS_MINY 130
-#define TS_MAXX 3800
-#define TS_MAXY 4000
-//
 #define TFT_CS 10
 #define TFT_DC 9
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
@@ -79,7 +73,7 @@ void setup(void)
     Serial.println("Touchscreen started."); 
   }
 
-  tft.fillScreen(ILI9341_BLUE);
+  tft.fillScreen(ILI9341_BLACK);
   // origin = left,top landscape (USB left upper)
   tft.setRotation(1); 
   redBtn();
@@ -121,6 +115,3 @@ void loop()
     Serial.println(RecordOn);
   }  
 }
-
-
-
