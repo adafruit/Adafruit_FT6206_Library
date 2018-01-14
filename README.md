@@ -1,5 +1,7 @@
 # Adafruit FT6206 Library [![Build Status](https://travis-ci.org/adafruit/Adafruit_FT6206_Library.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_FT6206_Library)
 
+<img src="https://cdn-shop.adafruit.com/970x728/1947-05.jpg" height="300"/>
+
 This is a library for the Adafruit FT6206-Based capacitive touch screens and displays:
   * https://www.adafruit.com/products/1947
   * https://www.adafruit.com/product/1651
