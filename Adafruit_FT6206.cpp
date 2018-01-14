@@ -49,26 +49,31 @@ boolean Adafruit_FT6206::begin(uint8_t thresh) {
   Wire.begin();
 
 #ifdef FT6206_DEBUG
-  Serial.print("Vend ID: "); Serial.println(readRegister8(FT6206_REG_VENDID));
-  Serial.print("Chip ID: "); Serial.println(readRegister8(FT6206_REG_CHIPID));
-  Serial.print("Firm V: "); Serial.println(readRegister8(FT6206_REG_FIRMVERS));
+  Serial.print("Vend ID: 0x"); 
+  Serial.println(readRegister8(FT62XX_REG_VENDID), HEX);
+  Serial.print("Chip ID: 0x"); 
+  Serial.println(readRegister8(FT62XX_REG_CHIPID), HEX);
+  Serial.print("Firm V: "); Serial.println(readRegister8(FT62XX_REG_FIRMVERS));
   Serial.print("Point Rate Hz: "); 
-  Serial.println(readRegister8(FT6206_REG_POINTRATE));
+  Serial.println(readRegister8(FT62XX_REG_POINTRATE));
   Serial.print("Thresh: "); 
-  Serial.println(readRegister8(FT6206_REG_THRESHHOLD));
+  Serial.println(readRegister8(FT62XX_REG_THRESHHOLD));
 
   // dump all registers
-  for (int16_t i=0; i<0x20; i++) {
+  for (int16_t i=0; i<0x10; i++) {
     Serial.print("I2C $"); Serial.print(i, HEX);
     Serial.print(" = 0x"); Serial.println(readRegister8(i), HEX);
   }
 #endif
 
   // change threshhold to be higher/lower
-  writeRegister8(FT6206_REG_THRESHHOLD, thresh);
+  writeRegister8(FT62XX_REG_THRESHHOLD, thresh);
   
-  if ((readRegister8(FT6206_REG_VENDID) != 17) || 
-      (readRegister8(FT6206_REG_CHIPID) != 6)) {
+  if (readRegister8(FT62XX_REG_VENDID) != FT62XX_VENDID) {
+    return false;
+  }
+  uint8_t id = readRegister8(FT62XX_REG_CHIPID);
+  if ((id != FT6206_CHIPID) && (id != FT6236_CHIPID) && (id != FT6236U_CHIPID)) {
     return false;
   }
 
@@ -82,7 +87,7 @@ boolean Adafruit_FT6206::begin(uint8_t thresh) {
 */
 /**************************************************************************/
 uint8_t Adafruit_FT6206::touched(void) {
-  uint8_t n = readRegister8(FT6206_REG_NUMTOUCHES);
+  uint8_t n = readRegister8(FT62XX_REG_NUMTOUCHES);
   if (n > 2) {
     n = 0;
   }
@@ -115,11 +120,11 @@ TS_Point Adafruit_FT6206::getPoint(uint8_t n) {
 void Adafruit_FT6206::readData(void) {
 
   uint8_t i2cdat[16];
-  Wire.beginTransmission(FT6206_ADDR);
+  Wire.beginTransmission(FT62XX_ADDR);
   Wire.write((byte)0);  
   Wire.endTransmission();
 
-  Wire.requestFrom((byte)FT6206_ADDR, (byte)16);
+  Wire.requestFrom((byte)FT62XX_ADDR, (byte)16);
   for (uint8_t i=0; i<16; i++)
     i2cdat[i] = Wire.read();
 
@@ -173,11 +178,11 @@ void Adafruit_FT6206::readData(void) {
 uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
   uint8_t x ;
   // use i2c
-  Wire.beginTransmission(FT6206_ADDR);
+  Wire.beginTransmission(FT62XX_ADDR);
   Wire.write((byte)reg);
   Wire.endTransmission();
   
-  Wire.requestFrom((byte)FT6206_ADDR, (byte)1);
+  Wire.requestFrom((byte)FT62XX_ADDR, (byte)1);
   x = Wire.read();
 
 #ifdef I2C_DEBUG
@@ -190,7 +195,7 @@ uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
 
 void Adafruit_FT6206::writeRegister8(uint8_t reg, uint8_t val) {
   // use i2c
-  Wire.beginTransmission(FT6206_ADDR);
+  Wire.beginTransmission(FT62XX_ADDR);
   Wire.write((byte)reg);
   Wire.write((byte)val);
   Wire.endTransmission();
@@ -200,7 +205,7 @@ void Adafruit_FT6206::writeRegister8(uint8_t reg, uint8_t val) {
 
 // DONT DO THIS - REALLY - IT DOESNT WORK
 void Adafruit_FT6206::autoCalibrate(void) {
- writeRegister8(FT6206_REG_MODE, FT6206_REG_FACTORYMODE);
+ writeRegister8(FT06_REG_MODE, FT6206_REG_FACTORYMODE);
  delay(100);
  //Serial.println("Calibrating...");
  writeRegister8(FT6206_REG_CALIBRATE, 4);
