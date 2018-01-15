@@ -45,6 +45,11 @@
 // calibrated for Adafruit 2.8" ctp screen
 #define FT62XX_DEFAULT_THRESHOLD 128
 
+/**************************************************************************/
+/*! 
+    @brief  Helper class that stores a TouchScreen Point with x, y, and z coordinates, for easy math/comparison
+*/
+/**************************************************************************/
 class TS_Point {
  public:
   TS_Point(void);
@@ -53,9 +58,16 @@ class TS_Point {
   bool operator==(TS_Point);
   bool operator!=(TS_Point);
 
-  int16_t x, y, z;
+  int16_t x; /*!< X coordinate */
+  int16_t y; /*!< Y coordinate */
+  int16_t z; /*!< Z coordinate (often used for pressure) */
 };
 
+/**************************************************************************/
+/*! 
+    @brief  Class that stores state and functions for interacting with FT6206 capacitive touch chips
+*/
+/**************************************************************************/
 class Adafruit_FT6206 {
  public:
 

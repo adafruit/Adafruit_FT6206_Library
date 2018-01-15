@@ -232,20 +232,46 @@ void Adafruit_FT6206::autoCalibrate(void) {
 
 /****************/
 
+/**************************************************************************/
+/*! 
+    @brief  Instantiates a new FT6206 class with x, y and z set to 0 by default
+*/
+/**************************************************************************/
 TS_Point::TS_Point(void) {
-  x = y = 0;
+  x = y = z = 0;
 }
 
-TS_Point::TS_Point(int16_t x0, int16_t y0, int16_t z0) {
-  x = x0;
-  y = y0;
-  z = z0;
+/**************************************************************************/
+/*! 
+    @brief  Instantiates a new FT6206 class with x, y and z set by params.
+    @param  _x The X coordinate
+    @param  _y The Y coordinate
+    @param  _z The Z coordinate
+*/
+/**************************************************************************/
+
+TS_Point::TS_Point(int16_t _x, int16_t _y, int16_t _z) {
+  x = _x;
+  y = _y;
+  z = _z;
 }
 
+/**************************************************************************/
+/*! 
+    @brief  Simple == comparator for two TS_Point objects
+    @returns True if x, y and z are the same for both points, False otherwise.
+*/
+/**************************************************************************/
 bool TS_Point::operator==(TS_Point p1) {
   return  ((p1.x == x) && (p1.y == y) && (p1.z == z));
 }
 
+/**************************************************************************/
+/*! 
+    @brief  Simple != comparator for two TS_Point objects
+    @returns False if x, y and z are the same for both points, True otherwise.
+*/
+/**************************************************************************/
 bool TS_Point::operator!=(TS_Point p1) {
   return  ((p1.x != x) || (p1.y != y) || (p1.z != z));
 }
