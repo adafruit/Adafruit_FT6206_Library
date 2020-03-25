@@ -1,8 +1,8 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Adafruit Capacitive Touch Screens
 
   ----> http://www.adafruit.com/products/1947
- 
+
   Check out the links above for our tutorials and wiring diagrams
   This chipset uses I2C to communicate
 
@@ -20,12 +20,12 @@
 #include "Arduino.h"
 #include <Wire.h>
 
-#define FT62XX_ADDR           0x38
-#define FT62XX_G_FT5201ID     0xA8
+#define FT62XX_ADDR 0x38
+#define FT62XX_G_FT5201ID 0xA8
 #define FT62XX_REG_NUMTOUCHES 0x02
 
-#define FT62XX_NUM_X             0x33
-#define FT62XX_NUM_Y             0x34
+#define FT62XX_NUM_X 0x33
+#define FT62XX_NUM_Y 0x34
 
 #define FT62XX_REG_MODE 0x00
 #define FT62XX_REG_CALIBRATE 0x02
@@ -46,15 +46,16 @@
 #define FT62XX_DEFAULT_THRESHOLD 128
 
 /**************************************************************************/
-/*! 
-    @brief  Helper class that stores a TouchScreen Point with x, y, and z coordinates, for easy math/comparison
+/*!
+    @brief  Helper class that stores a TouchScreen Point with x, y, and z
+   coordinates, for easy math/comparison
 */
 /**************************************************************************/
 class TS_Point {
- public:
+public:
   TS_Point(void);
   TS_Point(int16_t x, int16_t y, int16_t z);
-  
+
   bool operator==(TS_Point);
   bool operator!=(TS_Point);
 
@@ -64,28 +65,27 @@ class TS_Point {
 };
 
 /**************************************************************************/
-/*! 
-    @brief  Class that stores state and functions for interacting with FT6206 capacitive touch chips
+/*!
+    @brief  Class that stores state and functions for interacting with FT6206
+   capacitive touch chips
 */
 /**************************************************************************/
 class Adafruit_FT6206 {
- public:
-
+public:
   Adafruit_FT6206(void);
-  boolean begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD);  
+  boolean begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD);
   uint8_t touched(void);
   TS_Point getPoint(uint8_t n = 0);
 
-  //void autoCalibrate(void); 
+  // void autoCalibrate(void);
 
- private:
+private:
   void writeRegister8(uint8_t reg, uint8_t val);
   uint8_t readRegister8(uint8_t reg);
 
   void readData(void);
   uint8_t touches;
   uint16_t touchX[2], touchY[2], touchID[2];
-
 };
 
-#endif //ADAFRUIT_FT6206_LIBRARY
+#endif // ADAFRUIT_FT6206_LIBRARY
