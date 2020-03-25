@@ -1,4 +1,4 @@
-# Adafruit FT6206 Library [![Build Status](https://travis-ci.org/adafruit/Adafruit_FT6206_Library.svg?branch=master)](https://travis-ci.org/adafruit/Adafruit_FT6206_Library)
+# Adafruit_FT6206 Library [![Build Status](https://github.com/adafruit/Adafruit_FT6206_Library/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_FT6206_Library/actions)
 
 <img src="https://cdn-shop.adafruit.com/970x728/1947-05.jpg" height="300"/>
 
