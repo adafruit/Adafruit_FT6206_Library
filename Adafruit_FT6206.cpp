@@ -1,7 +1,7 @@
 /*!
  * @file Adafruit_FT6206.cpp
  *
- * @mainpage Adafruit FT2606 Library 
+ * @mainpage Adafruit FT2606 Library
  *
  * @section intro_sec Introduction
  *
