@@ -1,18 +1,29 @@
-/***************************************************
-  This is a library for the Adafruit Capacitive Touch Screens
+/*!
+ * @file Adafruit_FT6206.cpp
+ *
+ * @mainpage Adafruit FT2606 Library 
+ *
+ * @section intro_sec Introduction
+ *
+ * This is a library for the Adafruit Capacitive Touch Screens
+ *
+ * ----> http://www.adafruit.com/products/1947
+ *
+ * Check out the links above for our tutorials and wiring diagrams
+ * This chipset uses I2C to communicate
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ *
+ * @section author Author
+ *
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ *
+ * @section license License
 
-  ----> http://www.adafruit.com/products/1947
-
-  Check out the links above for our tutorials and wiring diagrams
-  This chipset uses I2C to communicate
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
+ * MIT license, all text above must be included in any redistribution
+ */
 
 #include "Arduino.h"
 #include <Adafruit_FT6206.h>
