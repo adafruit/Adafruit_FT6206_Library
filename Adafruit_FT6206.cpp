@@ -53,8 +53,12 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
     @returns True if an FT6206 is found, false on any failure
 */
 /**************************************************************************/
-boolean Adafruit_FT6206::begin(uint8_t thresh) {
-  Wire.begin();
+boolean Adafruit_FT6206::begin(uint8_t thresh, int sda, int scl) {
+  if(sda >= 0 && scl >= 0){
+    Wire.begin(sda, scl);
+  }else{
+    Wire.begin();
+  }
 
 #ifdef FT6206_DEBUG
   Serial.print("Vend ID: 0x");
