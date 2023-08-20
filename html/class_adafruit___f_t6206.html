@@ -77,9 +77,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___f_t6206.html#aa35eb0e3808a481c814492a8c875f10d">Adafruit_FT6206</a> (void)</td></tr>
 <tr class="memdesc:aa35eb0e3808a481c814492a8c875f10d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates a new FT6206 class. <br /></td></tr>
 <tr class="separator:aa35eb0e3808a481c814492a8c875f10d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a909a422c60f093769e66e825c3a1099d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___f_t6206.html#a909a422c60f093769e66e825c3a1099d">begin</a> (uint8_t thresh=<a class="el" href="_adafruit___f_t6206_8h.html#a6288cf98ef47a6464bcd220d6bff96f1">FT62XX_DEFAULT_THRESHOLD</a>)</td></tr>
-<tr class="memdesc:a909a422c60f093769e66e825c3a1099d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setups the I2C interface and hardware, identifies if chip is found.  <a href="#a909a422c60f093769e66e825c3a1099d">More...</a><br /></td></tr>
-<tr class="separator:a909a422c60f093769e66e825c3a1099d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac85813345d2285bcb84d800bbf25e38c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___f_t6206.html#ac85813345d2285bcb84d800bbf25e38c">begin</a> (uint8_t thresh=<a class="el" href="_adafruit___f_t6206_8h.html#a6288cf98ef47a6464bcd220d6bff96f1">FT62XX_DEFAULT_THRESHOLD</a>, TwoWire *theWire=&amp;Wire)</td></tr>
+<tr class="memdesc:ac85813345d2285bcb84d800bbf25e38c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setups the I2C interface and hardware, identifies if chip is found.  <a href="#ac85813345d2285bcb84d800bbf25e38c">More...</a><br /></td></tr>
+<tr class="separator:ac85813345d2285bcb84d800bbf25e38c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00858a298fcb2542164f054c8f665c1b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___f_t6206.html#a00858a298fcb2542164f054c8f665c1b">touched</a> (void)</td></tr>
 <tr class="memdesc:a00858a298fcb2542164f054c8f665c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if there are any touches detected.  <a href="#a00858a298fcb2542164f054c8f665c1b">More...</a><br /></td></tr>
 <tr class="separator:a00858a298fcb2542164f054c8f665c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -90,18 +90,28 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that stores state and functions for interacting with FT6206 capacitive touch chips. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a909a422c60f093769e66e825c3a1099d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a909a422c60f093769e66e825c3a1099d">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="ac85813345d2285bcb84d800bbf25e38c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac85813345d2285bcb84d800bbf25e38c">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boolean Adafruit_FT6206::begin </td>
+          <td class="memname">bool Adafruit_FT6206::begin </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>thresh</em> = <code><a class="el" href="_adafruit___f_t6206_8h.html#a6288cf98ef47a6464bcd220d6bff96f1">FT62XX_DEFAULT_THRESHOLD</a></code></td><td>)</td>
+          <td class="paramname"><em>thresh</em> = <code><a class="el" href="_adafruit___f_t6206_8h.html#a6288cf98ef47a6464bcd220d6bff96f1">FT62XX_DEFAULT_THRESHOLD</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">TwoWire *&#160;</td>
+          <td class="paramname"><em>theWire</em> = <code>&amp;Wire</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -109,7 +119,8 @@ Public Member Functions</h2></td></tr>
 <p>Setups the I2C interface and hardware, identifies if chip is found. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">thresh</td><td>Optional threshhold-for-touch value, default is FT6206_DEFAULT_THRESSHOLD but you can try changing it if your screen is too/not sensitive. </td></tr>
+    <tr><td class="paramname">thresh</td><td>Optional threshhold-for-touch value, default is FT6206_DEFAULT_THRESHOLD but you can try changing it if your screen is too/not sensitive. </td></tr>
+    <tr><td class="paramname">theWire</td><td>Which I2C bus to use, defaults to &amp;Wire </td></tr>
   </table>
   </dd>
 </dl>
