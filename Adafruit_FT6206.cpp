@@ -25,16 +25,9 @@
  * MIT license, all text above must be included in any redistribution
  */
 
-#include "Arduino.h"
 #include <Adafruit_FT6206.h>
-#include <Wire.h>
-
-#if defined(__SAM3X8E__)
-#define Wire Wire1
-#endif
 
 //#define FT6206_DEBUG
-//#define I2C_DEBUG
 
 /**************************************************************************/
 /*!
@@ -48,13 +41,18 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
 /*!
     @brief  Setups the I2C interface and hardware, identifies if chip is found
     @param  thresh Optional threshhold-for-touch value, default is
-   FT6206_DEFAULT_THRESSHOLD but you can try changing it if your screen is
+   FT6206_DEFAULT_THRESHOLD but you can try changing it if your screen is
    too/not sensitive.
+    @param theWire Which I2C bus to use, defaults to &Wire
     @returns True if an FT6206 is found, false on any failure
 */
 /**************************************************************************/
-boolean Adafruit_FT6206::begin(uint8_t thresh) {
-  Wire.begin();
+bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire) {
+  if (i2c_dev)
+    delete i2c_dev;
+  i2c_dev = new Adafruit_I2CDevice(FT62XX_ADDR, theWire);
+  if (!i2c_dev->begin())
+    return false;
 
 #ifdef FT6206_DEBUG
   Serial.print("Vend ID: 0x");
@@ -137,22 +135,8 @@ TS_Point Adafruit_FT6206::getPoint(uint8_t n) {
 void Adafruit_FT6206::readData(void) {
 
   uint8_t i2cdat[16];
-  Wire.beginTransmission(FT62XX_ADDR);
-  Wire.write((byte)0);
-  Wire.endTransmission();
-
-  Wire.requestFrom((byte)FT62XX_ADDR, (byte)16);
-  for (uint8_t i = 0; i < 16; i++)
-    i2cdat[i] = Wire.read();
-
-#ifdef FT6206_DEBUG
-  for (int16_t i = 0; i < 16; i++) {
-    Serial.print("I2C $");
-    Serial.print(i, HEX);
-    Serial.print(" = 0x");
-    Serial.println(i2cdat[i], HEX);
-  }
-#endif
+  uint8_t addr = 0;
+  i2c_dev->write_then_read(&addr, 1, i2cdat, 16);
 
   touches = i2cdat[0x02];
   if ((touches > 2) || (touches == 0)) {
@@ -201,31 +185,14 @@ void Adafruit_FT6206::readData(void) {
 }
 
 uint8_t Adafruit_FT6206::readRegister8(uint8_t reg) {
-  uint8_t x;
-  // use i2c
-  Wire.beginTransmission(FT62XX_ADDR);
-  Wire.write((byte)reg);
-  Wire.endTransmission();
-
-  Wire.requestFrom((byte)FT62XX_ADDR, (byte)1);
-  x = Wire.read();
-
-#ifdef I2C_DEBUG
-  Serial.print("$");
-  Serial.print(reg, HEX);
-  Serial.print(": 0x");
-  Serial.println(x, HEX);
-#endif
-
-  return x;
+  uint8_t buffer[1] = {reg};
+  i2c_dev->write_then_read(buffer, 1, buffer, 1);
+  return buffer[0];
 }
 
 void Adafruit_FT6206::writeRegister8(uint8_t reg, uint8_t val) {
-  // use i2c
-  Wire.beginTransmission(FT62XX_ADDR);
-  Wire.write((byte)reg);
-  Wire.write((byte)val);
-  Wire.endTransmission();
+  uint8_t buffer[2] = {reg, val};
+  i2c_dev->write(buffer, 2);
 }
 
 /*

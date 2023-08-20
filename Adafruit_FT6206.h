@@ -6,7 +6,7 @@
 #define ADAFRUIT_FT6206_LIBRARY
 
 #include "Arduino.h"
-#include <Wire.h>
+#include <Adafruit_I2CDevice.h>
 
 #define FT62XX_ADDR 0x38           //!< I2C address
 #define FT62XX_G_FT5201ID 0xA8     //!< FocalTech's panel ID
@@ -61,13 +61,15 @@ public:
 class Adafruit_FT6206 {
 public:
   Adafruit_FT6206(void);
-  boolean begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD);
+  bool begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD,
+             TwoWire *theWire = &Wire);
   uint8_t touched(void);
   TS_Point getPoint(uint8_t n = 0);
 
   // void autoCalibrate(void);
 
 private:
+  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
   void writeRegister8(uint8_t reg, uint8_t val);
   uint8_t readRegister8(uint8_t reg);
 

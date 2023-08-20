@@ -34,16 +34,16 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 int oldcolor, currentcolor;
 
 void setup(void) {
-  while (!Serial);     // used for leonardo debugging
- 
   Serial.begin(115200);
+  while (!Serial) delay(10);     // pause the serial port
+ 
   Serial.println(F("Cap Touch Paint!"));
   
   tft.begin();
 
-  if (! ctp.begin(40)) {  // pass in 'sensitivity' coefficient
+  if (! ctp.begin(40, &Wire)) {  // pass in 'sensitivity' coefficient and I2C bus
     Serial.println("Couldn't start FT6206 touchscreen controller");
-    while (1);
+    while (1) delay(10);
   }
 
   Serial.println("Capacitive touchscreen started");
