@@ -43,6 +43,7 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
     @param  thresh Optional threshhold-for-touch value, default is
    FT6206_DEFAULT_THRESHOLD but you can try changing it if your screen is
    too/not sensitive.
+    @param theWire Which I2C bus to use, defaults to &Wire
     @returns True if an FT6206 is found, false on any failure
 */
 /**************************************************************************/

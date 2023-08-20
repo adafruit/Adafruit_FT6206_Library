@@ -61,7 +61,8 @@ public:
 class Adafruit_FT6206 {
 public:
   Adafruit_FT6206(void);
-  bool begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD, TwoWire *theWire = &Wire);
+  bool begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD,
+             TwoWire *theWire = &Wire);
   uint8_t touched(void);
   TS_Point getPoint(uint8_t n = 0);
 
