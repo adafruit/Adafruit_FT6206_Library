@@ -44,10 +44,12 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
    FT6206_DEFAULT_THRESHOLD but you can try changing it if your screen is
    too/not sensitive. You can also try 0 to not change the threshold.
     @param theWire Which I2C bus to use, defaults to &Wire
+    @param i2c_addr The I2C address we expect to find the touch panel at
     @returns True if an FT captouch is found, false on any failure
 */
 /**************************************************************************/
-bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire, uint8_t i2c_addr) {
+bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire,
+                            uint8_t i2c_addr) {
   if (i2c_dev)
     delete i2c_dev;
   i2c_dev = new Adafruit_I2CDevice(i2c_addr, theWire);

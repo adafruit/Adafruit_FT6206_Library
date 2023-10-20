@@ -8,7 +8,7 @@
 #include "Arduino.h"
 #include <Adafruit_I2CDevice.h>
 
-#define FT62XX_DEFAULT_ADDR 0x38           //!< I2C address
+#define FT62XX_DEFAULT_ADDR 0x38   //!< I2C address
 #define FT62XX_G_FT5201ID 0xA8     //!< FocalTech's panel ID
 #define FT62XX_REG_NUMTOUCHES 0x02 //!< Number of touch points
 
