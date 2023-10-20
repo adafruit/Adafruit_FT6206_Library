@@ -8,7 +8,7 @@
 #include "Arduino.h"
 #include <Adafruit_I2CDevice.h>
 
-#define FT62XX_ADDR 0x38           //!< I2C address
+#define FT62XX_DEFAULT_ADDR 0x38           //!< I2C address
 #define FT62XX_G_FT5201ID 0xA8     //!< FocalTech's panel ID
 #define FT62XX_REG_NUMTOUCHES 0x02 //!< Number of touch points
 
@@ -29,6 +29,7 @@
 #define FT6206_CHIPID 0x06  //!< Chip selecting
 #define FT6236_CHIPID 0x36  //!< Chip selecting
 #define FT6236U_CHIPID 0x64 //!< Chip selecting
+#define FT6336U_CHIPID 0x64 //!< Chip selecting
 
 // calibrated for Adafruit 2.8" ctp screen
 #define FT62XX_DEFAULT_THRESHOLD 128 //!< Default threshold for touch detection
@@ -62,7 +63,7 @@ class Adafruit_FT6206 {
 public:
   Adafruit_FT6206(void);
   bool begin(uint8_t thresh = FT62XX_DEFAULT_THRESHOLD,
-             TwoWire *theWire = &Wire);
+             TwoWire *theWire = &Wire, uint8_t i2c_addr = FT62XX_DEFAULT_ADDR);
   uint8_t touched(void);
   TS_Point getPoint(uint8_t n = 0);
 

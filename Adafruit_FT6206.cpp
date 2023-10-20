@@ -42,15 +42,15 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
     @brief  Setups the I2C interface and hardware, identifies if chip is found
     @param  thresh Optional threshhold-for-touch value, default is
    FT6206_DEFAULT_THRESHOLD but you can try changing it if your screen is
-   too/not sensitive.
+   too/not sensitive. You can also try 0 to not change the threshold.
     @param theWire Which I2C bus to use, defaults to &Wire
-    @returns True if an FT6206 is found, false on any failure
+    @returns True if an FT captouch is found, false on any failure
 */
 /**************************************************************************/
-bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire) {
+bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire, uint8_t i2c_addr) {
   if (i2c_dev)
     delete i2c_dev;
-  i2c_dev = new Adafruit_I2CDevice(FT62XX_ADDR, theWire);
+  i2c_dev = new Adafruit_I2CDevice(i2c_addr, theWire);
   if (!i2c_dev->begin())
     return false;
 
@@ -75,15 +75,16 @@ bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire) {
   }
 #endif
 
-  // change threshhold to be higher/lower
-  writeRegister8(FT62XX_REG_THRESHHOLD, thresh);
+  // change threshhold to be higher/lower if desired
+  if (thresh != 0)
+    writeRegister8(FT62XX_REG_THRESHHOLD, thresh);
 
   if (readRegister8(FT62XX_REG_VENDID) != FT62XX_VENDID) {
     return false;
   }
   uint8_t id = readRegister8(FT62XX_REG_CHIPID);
   if ((id != FT6206_CHIPID) && (id != FT6236_CHIPID) &&
-      (id != FT6236U_CHIPID)) {
+      (id != FT6236U_CHIPID) && (id != FT6336U_CHIPID)) {
     return false;
   }
 
@@ -139,14 +140,15 @@ void Adafruit_FT6206::readData(void) {
   i2c_dev->write_then_read(&addr, 1, i2cdat, 16);
 
   touches = i2cdat[0x02];
+#ifdef FT6206_DEBUG
+  Serial.print("# Touches: ");
+  Serial.println(touches);
+#endif
   if ((touches > 2) || (touches == 0)) {
     touches = 0;
   }
 
 #ifdef FT6206_DEBUG
-  Serial.print("# Touches: ");
-  Serial.println(touches);
-
   for (uint8_t i = 0; i < 16; i++) {
     Serial.print("0x");
     Serial.print(i2cdat[i], HEX);
