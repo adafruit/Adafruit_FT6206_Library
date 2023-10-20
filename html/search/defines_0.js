@@ -3,7 +3,7 @@ var searchData=
   ['ft6206_5fchipid',['FT6206_CHIPID',['../_adafruit___f_t6206_8h.html#ac250eb0bbafd6f45a38fc17cde1479be',1,'Adafruit_FT6206.h']]],
   ['ft6236_5fchipid',['FT6236_CHIPID',['../_adafruit___f_t6206_8h.html#a5d45c567dfbd8cafb7bfee903825e9c5',1,'Adafruit_FT6206.h']]],
   ['ft6236u_5fchipid',['FT6236U_CHIPID',['../_adafruit___f_t6206_8h.html#a0fe40865b1f0dd0262c7ad3ebc678793',1,'Adafruit_FT6206.h']]],
-  ['ft62xx_5faddr',['FT62XX_ADDR',['../_adafruit___f_t6206_8h.html#a7252a5491cc42f12db0295b39b0d3aab',1,'Adafruit_FT6206.h']]],
+  ['ft62xx_5fdefault_5faddr',['FT62XX_DEFAULT_ADDR',['../_adafruit___f_t6206_8h.html#a301cd6bd76cc80ceb92ffff1cbeef5fb',1,'Adafruit_FT6206.h']]],
   ['ft62xx_5fdefault_5fthreshold',['FT62XX_DEFAULT_THRESHOLD',['../_adafruit___f_t6206_8h.html#a6288cf98ef47a6464bcd220d6bff96f1',1,'Adafruit_FT6206.h']]],
   ['ft62xx_5fg_5fft5201id',['FT62XX_G_FT5201ID',['../_adafruit___f_t6206_8h.html#a6221e95a89929d7cb54f0f304929d8cb',1,'Adafruit_FT6206.h']]],
   ['ft62xx_5fnum_5fx',['FT62XX_NUM_X',['../_adafruit___f_t6206_8h.html#a9dc5b2bcda21db0cfb1e4c0a6dca206b',1,'Adafruit_FT6206.h']]],
@@ -18,5 +18,6 @@ var searchData=
   ['ft62xx_5freg_5fthreshhold',['FT62XX_REG_THRESHHOLD',['../_adafruit___f_t6206_8h.html#ad8ba6e692e870ee9aafbdd5be41ccb96',1,'Adafruit_FT6206.h']]],
   ['ft62xx_5freg_5fvendid',['FT62XX_REG_VENDID',['../_adafruit___f_t6206_8h.html#a63be9fbadabcfe728ba96bc48be2f122',1,'Adafruit_FT6206.h']]],
   ['ft62xx_5freg_5fworkmode',['FT62XX_REG_WORKMODE',['../_adafruit___f_t6206_8h.html#a12c8ec7df87a73af52d72199f4ef72f5',1,'Adafruit_FT6206.h']]],
-  ['ft62xx_5fvendid',['FT62XX_VENDID',['../_adafruit___f_t6206_8h.html#afe4da121c86b195f9ec56b79740203e1',1,'Adafruit_FT6206.h']]]
+  ['ft62xx_5fvendid',['FT62XX_VENDID',['../_adafruit___f_t6206_8h.html#afe4da121c86b195f9ec56b79740203e1',1,'Adafruit_FT6206.h']]],
+  ['ft6336u_5fchipid',['FT6336U_CHIPID',['../_adafruit___f_t6206_8h.html#a6bbd8830aecd0d5611c8efc9464cc976',1,'Adafruit_FT6206.h']]]
 ];
