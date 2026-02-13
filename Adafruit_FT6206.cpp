@@ -27,7 +27,7 @@
 
 #include <Adafruit_FT6206.h>
 
-//#define FT6206_DEBUG
+// #define FT6206_DEBUG
 
 /**************************************************************************/
 /*!
@@ -35,7 +35,9 @@
 */
 /**************************************************************************/
 // I2C, no address adjustments or pins
-Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
+Adafruit_FT6206::Adafruit_FT6206() {
+  touches = 0;
+}
 
 /**************************************************************************/
 /*!
@@ -48,7 +50,7 @@ Adafruit_FT6206::Adafruit_FT6206() { touches = 0; }
     @returns True if an FT captouch is found, false on any failure
 */
 /**************************************************************************/
-bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire *theWire,
+bool Adafruit_FT6206::begin(uint8_t thresh, TwoWire* theWire,
                             uint8_t i2c_addr) {
   if (i2c_dev)
     delete i2c_dev;
@@ -136,7 +138,6 @@ TS_Point Adafruit_FT6206::getPoint(uint8_t n) {
 */
 /**************************************************************************/
 void Adafruit_FT6206::readData(void) {
-
   uint8_t i2cdat[16];
   uint8_t addr = 0;
   i2c_dev->write_then_read(&addr, 1, i2cdat, 16);
@@ -235,7 +236,9 @@ void Adafruit_FT6206::autoCalibrate(void) {
     @brief  Instantiates a new FT6206 class with x, y and z set to 0 by default
 */
 /**************************************************************************/
-TS_Point::TS_Point(void) { x = y = z = 0; }
+TS_Point::TS_Point(void) {
+  x = y = z = 0;
+}
 
 /**************************************************************************/
 /*!
